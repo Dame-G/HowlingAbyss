@@ -1,0 +1,46 @@
+---
+import '@fontsource/geist-mono';
+import '@fontsource/geist-sans';
+import { ClientRouter } from 'astro:transitions';
+import Analytics from '@/components/root/analytics.astro';
+import Footer from '@/components/root/footer';
+import Header from '@/components/root/header';
+
+interface RootProps {
+	title: string;
+	description: string;
+}
+const { title, description } = Astro.props as RootProps;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<Analytics id={import.meta.env.GOOGLE_ANALYTICS_ID} />
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta
+			name="viewport"
+			content="width=device-width"
+		/>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="/favicon.svg"	
+		/>
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<ClientRouter />
+	</head>
+	<body
+		class="font-mono text-primary-foreground bg-primary relative antialiased"
+	>
+		<div class="flex h-[100vh] max-h-[100dvh] w-full flex-col">
+			<Header />
+			<main class="flex-grow  no-scrollbar">
+				<slot />
+			</main>
+			<Footer />
+		</div>
+	</body>
+</html>
