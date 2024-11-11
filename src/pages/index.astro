@@ -1,5 +1,5 @@
 ---
-import UnderConstruction from '@/components/meta/under-construction';
+import { SummonerSearch } from '@/components/summoner/summoner-search';
 import Root from '@/layouts/root.astro';
 
 const title = "Howling Abyss";
@@ -7,5 +7,7 @@ const description = "A stats page for League of Legends";
 ---
 
 <Root title={title} description={description}>
-  {import.meta.env.MAINTENANCE ? <UnderConstruction client:load /> : <p>h</p>}
+  <div class="container mx-auto p-2">  
+    <SummonerSearch client:load />
+  </div>
 </Root>

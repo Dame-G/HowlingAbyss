@@ -2,7 +2,7 @@
 import '@fontsource/geist-mono';
 import '@fontsource/geist-sans';
 import { ClientRouter } from 'astro:transitions';
-import Analytics from '@/components/root/analytics.astro';
+import "@/styles/globals.css"
 import Footer from '@/components/root/footer';
 import Header from '@/components/root/header';
 
@@ -16,7 +16,6 @@ const { title, description } = Astro.props as RootProps;
 <!doctype html>
 <html lang="en">
 	<head>
-		<Analytics id={import.meta.env.GOOGLE_ANALYTICS_ID} />
 		<meta charset="UTF-8" />
 		<meta name="description" content={description} />
 		<meta
