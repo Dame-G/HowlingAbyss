@@ -1,6 +1,6 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-import type { ApiResponse } from '@/types/api';
+import { type RiotAPIResponse, request } from '@/lib/api';
 import type { MatchIds } from '@/types/matches';
 import { REGION_MAPPING, SUMMONER_REGIONS } from '@/types/regions';
 
@@ -10,58 +10,37 @@ const getMatches = () => {
 			puuid: z.string(),
 			region: z.enum(SUMMONER_REGIONS),
 		}),
-		handler: async (input): Promise<ApiResponse<MatchIds>> => {
-			try {
-				const mappedRegion = REGION_MAPPING[input.region];
-				const allMatches: string[] = [];
-				let start = 0;
-				const count = 100;
+		handler: async (input): Promise<RiotAPIResponse<MatchIds>> => {
+			const mappedRegion = REGION_MAPPING[input.region];
+			const endpoint = '/lol/match/v5/matches/by-puuid';
+			const allMatches: string[] = [];
+			let start = 0;
+			const count = 100;
 
-				while (true) {
-					const queryParams = new URLSearchParams({
-						start: start.toString(),
-						count: count.toString(),
-					});
+			while (start < 1000) {
+				const queryParams = new URLSearchParams({
+					start: start.toString(),
+					count: count.toString(),
+				});
 
-					const url = `https://${mappedRegion}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.puuid}/ids?${queryParams}`;
+				const url = `https://${mappedRegion}.api.riotgames.com${endpoint}/${input.puuid}/ids?${queryParams}`;
+				const response = await request<string[]>(endpoint, url);
 
-					const response = await fetch(url, {
-						headers: {
-							'X-Riot-Token': import.meta.env.RIOT_API_KEY,
-						},
-					});
-
-					if (response.status === 429) {
-						const retryAfter = Number.parseInt(
-							response.headers.get('retry-after') || '60',
-						);
-						return {
-							error: 'Rate limit exceeded',
-							retryAfter,
-						};
-					}
-
-					if (!response.ok) {
-						return {
-							error: `API error: ${response.status}`,
-						};
-					}
-
-					const matches = await response.json();
-					if (matches.length === 0) break;
-
-					allMatches.push(...matches);
-					start += count;
-
-					await new Promise((resolve) => setTimeout(resolve, 100));
+				if (!response.data || response.data.length === 0) {
+					break;
 				}
 
-				return { data: allMatches };
-			} catch (error) {
-				return {
-					error: error instanceof Error ? error.message : 'Unknown error',
-				};
+				allMatches.push(...response.data);
+				if (response.data.length < count) {
+					break;
+				}
+
+				start += count;
 			}
+
+			return {
+				data: allMatches,
+			};
 		},
 	});
 };

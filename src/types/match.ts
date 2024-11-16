@@ -267,7 +267,6 @@ export interface ChallengesDto {
 	wardTakedowns: number;
 	wardTakedownsBefore20M: number;
 	wardsGuarded: number;
-	// SWARM specific challenges
 	SWARM_DefeatAatrox: number;
 	SWARM_DefeatBriar: number;
 	SWARM_DefeatMiniBosses: number;

@@ -1,10 +1,4 @@
-export type MatchesQueryParams = {
-	startTime?: number;
-	endTime?: number;
-	queue?: number;
-	type?: string;
-	start?: number;
-	count?: number;
-};
+import type { Match } from './match';
 
 export type MatchIds = string[];
+export type MatchData = { [matchId: string]: Match };

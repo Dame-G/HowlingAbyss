@@ -10,6 +10,7 @@ export default function Footer() {
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-xl"
+						aria-label='GitHub repository for "Howling Abyss"'
 					>
 						<SiGithub className="transition-opacity hover:opacity-50" />
 					</a>

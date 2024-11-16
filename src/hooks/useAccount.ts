@@ -1,25 +1,58 @@
 import { actions } from 'astro:actions';
-import { createApiHook } from '@/lib/hooks';
+import type { Limits } from '@/lib/api';
 import type { Account } from '@/types/account';
-import type { SummonerRegion } from '@/types/regions';
+import type { SUMMONER_REGIONS } from '@/types/regions';
+import { useCallback, useState } from 'react';
 
-export function useAccount() {
-	const hook = createApiHook<Account, [string, string, SummonerRegion]>();
-	const {
-		data: account,
-		error,
-		isLoading,
-		execute,
-	} = hook((summonerName, tagline, region) =>
-		actions
-			.getAccount({ summonerName, tagline, region })
-			.then((r) => r?.data ?? { error: 'No data' }),
+export const useAccount = () => {
+	const [data, setData] = useState<Account | undefined>();
+	const [limits, setLimits] = useState<Limits | undefined>();
+	const [error, setError] = useState<string | undefined>();
+	const [isLoading, setIsLoading] = useState(false);
+
+	const fetch = useCallback(
+		async (
+			gameName: string,
+			tagLine: string,
+			region: (typeof SUMMONER_REGIONS)[number],
+		) => {
+			setIsLoading(true);
+			setError(undefined);
+
+			try {
+				const { data: result, error } = await actions.getAccount({
+					gameName,
+					tagLine,
+					region,
+				});
+
+				if (error) {
+					setError(error.message);
+					return;
+				}
+
+				if (result.error) {
+					setError(result.error);
+					return;
+				}
+
+				setLimits(result.limits);
+				setData(result.data);
+			} catch (e) {
+				setError(e instanceof Error ? e.message : 'Unknown error occurred');
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[],
 	);
 
 	return {
-		account,
+		fetch,
+		data,
+		limits,
+		setData,
 		error,
 		isLoading,
-		getAccount: execute,
 	};
-}
+};
