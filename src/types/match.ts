@@ -15,7 +15,6 @@ export interface InfoDto {
 	gameDuration: number;
 	gameEndTimestamp: number;
 	gameId: number;
-	gameMode: string;
 	gameName: string;
 	gameStartTimestamp: number;
 	gameType: string;
@@ -23,9 +22,7 @@ export interface InfoDto {
 	mapId: number;
 	participants: ParticipantDto[];
 	platformId: string;
-	queueId: number;
 	teams: TeamDto[];
-	tournamentCode: string;
 }
 
 export interface ParticipantDto {
@@ -46,9 +43,7 @@ export interface ParticipantDto {
 	damageDealtToTurrets: number;
 	damageSelfMitigated: number;
 	deaths: number;
-	detectorWardsPlaced: number;
 	doubleKills: number;
-	dragonKills: number;
 	eligibleForProgression: boolean;
 	enemyMissingPings: number;
 	enemyVisionPings: number;
@@ -84,7 +79,6 @@ export interface ParticipantDto {
 	magicDamageDealt: number;
 	magicDamageDealtToChampions: number;
 	magicDamageTaken: number;
-	missions: MissionsDto;
 	neutralMinionsKilled: number;
 	needVisionPings: number;
 	nexusKills: number;
@@ -154,54 +148,30 @@ export interface ChallengesDto {
 	twelveAssistStreakCount: number;
 	abilityUses: number;
 	acesBefore15Minutes: number;
-	alliedJungleMonsterKills: number;
-	baronTakedowns: number;
 	blastConeOppositeOpponentCount: number;
 	bountyGold: number;
-	buffsStolen: number;
-	completeSupportQuestInTime: number;
 	controlWardsPlaced: number;
 	damagePerMinute: number;
 	damageTakenOnTeamPercentage: number;
-	dancedWithRiftHerald: number;
 	deathsByEnemyChamps: number;
 	dodgeSkillShotsSmallWindow: number;
 	doubleAces: number;
-	dragonTakedowns: number;
-	earliestBaron: number;
-	earliestDragonTakedown: number;
-	earliestElderDragon: number;
-	earlyLaningPhaseGoldExpAdvantage: number;
 	effectiveHealAndShielding: number;
-	elderDragonKillsWithOpposingSoul: number;
-	elderDragonMultikills: number;
 	enemyChampionImmobilizations: number;
-	enemyJungleMonsterKills: number;
-	epicMonsterKillsNearEnemyJungler: number;
-	epicMonsterKillsWithin30SecondsOfSpawn: number;
-	epicMonsterSteals: number;
-	epicMonsterStolenWithoutSmite: number;
 	flawlessAces: number;
 	fullTeamTakedown: number;
 	gameLength: number;
-	getTakedownsInAllLanesEarlyJungleAsLaner: number;
 	goldPerMinute: number;
 	hadAfkTeammate: number;
 	hadOpenNexus: number;
 	highestCrowdControlScore: number;
 	immobilizeAndKillWithAlly: number;
-	initialBuffCount: number;
-	initialCrabCount: number;
-	jungleCsBefore10Minutes: number;
-	junglerKillsEarlyJungle: number;
-	junglerTakedownsNearDamagedEpicMonster: number;
 	kTurretsDestroyedBeforePlatesFall: number;
 	kda: number;
 	killAfterHiddenWithAlly: number;
 	killParticipation: number;
 	killedChampTookFullTeamDamageSurvived: number;
 	killsNearEnemyTurret: number;
-	killsOnOtherLanesEarlyJungleAsLaner: number;
 	killsOnRecentlyHealedByAramPack: number;
 	killsUnderOwnTurret: number;
 	killsWithHelpFromEpicMonster: number;
@@ -211,20 +181,13 @@ export interface ChallengesDto {
 	laningPhaseGoldExpAdvantage: number;
 	legendaryCount: number;
 	lostAnInhibitor: number;
-	maxCsAdvantageOnLaneOpponent: number;
 	maxKillDeficit: number;
-	maxLevelLeadLaneOpponent: number;
-	mejaisFullStackInTime: number;
-	moreEnemyJungleThanOpponent: number;
 	multiKillOneSpell: number;
-	multiTurretRiftHeraldCount: number;
 	multikills: number;
 	multikillsAfterAggressiveFlash: number;
-	mythicItemUsed: number;
 	outerTurretExecutesBefore10Minutes: number;
 	outnumberedKills: number;
 	outnumberedNexusKill: number;
-	perfectDragonSoulsTaken: number;
 	perfectGame: number;
 	pickKillWithAlly: number;
 	playedChampSelectPosition: number;
@@ -232,50 +195,23 @@ export interface ChallengesDto {
 	quickCleanse: number;
 	quickFirstTurret: number;
 	quickSoloKills: number;
-	riftHeraldTakedowns: number;
 	saveAllyFromDeath: number;
-	scuttleCrabKills: number;
 	skillshotsDodged: number;
 	skillshotsHit: number;
 	snowballsHit: number;
-	soloBaronKills: number;
 	soloKills: number;
-	stealthWardsPlaced: number;
 	survivedSingleDigitHpCount: number;
 	survivedThreeImmobilizesInFight: number;
 	takedownOnFirstTurret: number;
 	takedowns: number;
 	takedownsAfterGainingLevelAdvantage: number;
-	takedownsBeforeJungleMinionSpawn: number;
 	takedownsFirstXMinutes: number;
-	takedownsInAlcove: number;
-	takedownsInEnemyFountain: number;
-	teamBaronKills: number;
 	teamDamagePercentage: number;
-	teamElderDragonKills: number;
-	teamRiftHeraldKills: number;
 	threeWardsOneSweeperCount: number;
 	tookLargeDamageSurvived: number;
 	turretPlatesTaken: number;
 	turretTakedowns: number;
-	turretsTakenWithRiftHerald: number;
 	twentyMinionsIn3SecondsCount: number;
-	twoWardsOneSweeperCount: number;
-	unseenRecalls: number;
-	visionScoreAdvantageLaneOpponent: number;
-	visionScorePerMinute: number;
-	wardTakedowns: number;
-	wardTakedownsBefore20M: number;
-	wardsGuarded: number;
-	SWARM_DefeatAatrox: number;
-	SWARM_DefeatBriar: number;
-	SWARM_DefeatMiniBosses: number;
-	SWARM_EvolveWeapon: number;
-	SWARM_Have3Passives: number;
-	SWARM_KillEnemy: number;
-	SWARM_PickupGold: number;
-	SWARM_ReachLevel50: number;
-	SWARM_Survive15Min: number;
 }
 export interface PerksDto {
 	statPerks: PerkStatsDto;
@@ -302,43 +238,17 @@ export interface PerkStyleSelectionDto {
 }
 
 export interface TeamDto {
-	bans: BanDto[];
 	objectives: ObjectivesDto;
 	teamId: number;
 	win: boolean;
 }
 
-export interface BanDto {
-	championId: number;
-	pickTurn: number;
-}
-
 export interface ObjectivesDto {
-	baron: ObjectiveDto;
 	champion: ObjectiveDto;
-	dragon: ObjectiveDto;
-	horde: ObjectiveDto;
-	inhibitor: ObjectiveDto;
-	riftHerald: ObjectiveDto;
 	tower: ObjectiveDto;
 }
 
 export interface ObjectiveDto {
 	first: boolean;
 	kills: number;
-}
-
-export interface MissionsDto {
-	playerScore0: number;
-	playerScore1: number;
-	playerScore2: number;
-	playerScore3: number;
-	playerScore4: number;
-	playerScore5: number;
-	playerScore6: number;
-	playerScore7: number;
-	playerScore8: number;
-	playerScore9: number;
-	playerScore10: number;
-	playerScore11: number;
 }

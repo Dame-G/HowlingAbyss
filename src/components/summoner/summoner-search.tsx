@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
 	Select,
@@ -7,134 +6,149 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { useAccount } from '@/hooks/useAccount';
-import { useMatches } from '@/hooks/useMatches';
-import { useSummoner } from '@/hooks/useSummoner';
-import { SUMMONER_REGIONS } from '@/types/regions';
-import { useEffect, useState } from 'react';
-import { MatchesDisplay } from './matches-display';
-import { SummonerDisplay } from './summoner-display';
+import { useSummonerData } from '@/hooks/use-summoner-data';
+import { getStored, setStored } from '@/lib/storage';
+import { SUMMONER_REGIONS, type SummonerRegion } from '@/types/regions';
+import { motion } from 'framer-motion';
+import { Search } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Button } from '../ui/button';
+import { LoadingState } from './loading-state';
+import SummonerView from './summoner-view';
 
 export function SummonerSearch() {
 	const [summonerName, setSummonerName] = useState('');
-	const [selectedRegion, setSelectedRegion] = useState<
-		(typeof SUMMONER_REGIONS)[number]
-	>(SUMMONER_REGIONS[7]);
+	const [selectedRegion, setSelectedRegion] = useState<SummonerRegion>('na1');
+	const [searchRegion, setSearchRegion] = useState<SummonerRegion>('na1');
 
-	const {
-		fetch: fetchAccount,
-		data: account,
-		setData: setAccount,
-		isLoading: accountIsLoading,
-		error: accountError,
-	} = useAccount();
-
-	const {
-		fetch: fetchSummoner,
-		data: summoner,
-		setData: setSummoner,
-		isLoading: summonerIsLoading,
-		error: summonerError,
-	} = useSummoner();
-
-	const {
-		fetch: fetchMatches,
-		data: matches,
-		setData: setMatches,
-		isLoading: matchesIsLoading,
-		error: matchesError,
-	} = useMatches();
-
-	const handleSearch = async () => {
-		if (account) setAccount(undefined);
-		if (summoner) setSummoner(undefined);
-		if (matches) setMatches(undefined);
-		if (!summonerName) return;
-		const [gameName, tagLine] = summonerName.split('#');
-		await fetchAccount(gameName, tagLine, selectedRegion);
-		setSummonerName('');
+	const handleRegionChange = (value: SummonerRegion) => {
+		setSelectedRegion(value);
+		setStored('region', value);
 	};
 
-	useEffect(() => {
-		if (account && !summoner) {
-			fetchSummoner(account.puuid, selectedRegion);
-			fetchMatches(account.puuid, selectedRegion);
-		}
-	}, [account, summoner, fetchSummoner, fetchMatches, selectedRegion]);
+	const { fetchSummonerData, reset, data, error, isLoading, retryAfter } =
+		useSummonerData();
 
-	const isLoading = accountIsLoading || summonerIsLoading || matchesIsLoading;
-	const error = accountError || summonerError || matchesError;
+	const handleSearch = useCallback(async () => {
+		if (!summonerName) return;
+		setStored('name', summonerName);
+		const [gameName, tagLine] = summonerName.split('#');
+
+		if (data) {
+			reset();
+		}
+
+		setSearchRegion(selectedRegion);
+		fetchSummonerData(gameName, tagLine, selectedRegion, 450);
+	}, [summonerName, selectedRegion, fetchSummonerData, reset, data]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		handleSearch();
 	};
 
-	return (
-		<div className="mx-auto w-full max-w-2xl space-y-2">
-			<form onSubmit={handleSubmit} className="flex flex-col gap-2">
-				<div className="flex gap-2 rounded-md">
-					<Select
-						value={selectedRegion}
-						onValueChange={(value: string) =>
-							setSelectedRegion(value as typeof selectedRegion)
-						}
-						disabled={isLoading}
-					>
-						<SelectTrigger
-							aria-label="Region"
-							className={
-								'w-1/4 min-w-[100px] justify-between rounded-none border-0 border-gold-300 border-b bg-transparent px-1 text-gold-300 transition-all hover:border-gold-400 hover:text-gold-400 focus:outline-0 focus:ring-0 focus:ring-offset-0 data-[state=open]:border-gold-400 sm:w-[180px] [&>span]:text-primary-foreground'
-							}
-						>
-							<SelectValue placeholder="Select region" />
-						</SelectTrigger>
-						<SelectContent className="w-full rounded-sm border-gold-400 bg-blue-700 text-gold-400">
-							{SUMMONER_REGIONS.map((region) => (
-								<SelectItem
-									key={region}
-									value={region}
-									className={`mb-1 rounded-sm last:mb-0 focus:bg-gold-400 ${
-										selectedRegion === region ? 'bg-gold-400 text-primary' : ''
-									}`}
-								>
-									{region.toUpperCase()}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<div className="flex w-3/4 items-center">
-						<Input
-							aria-label="Summoner name"
-							type="text"
-							placeholder="Summoner#TAG"
-							value={summonerName}
-							onChange={(e) => setSummonerName(e.target.value)}
-							className={
-								'w-full rounded-none border-0 border-gold-300 border-b bg-transparent px-1 py-0 font-thin transition-all placeholder:text-muted-foreground/60 hover:border-gold-400 focus:border-gold-400 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0'
-							}
-							disabled={isLoading}
-							role="search"
-						/>
-					</div>
-				</div>
+	useEffect(() => {
+		const storedRegion = getStored<SummonerRegion>('region');
+		if (storedRegion) setSelectedRegion(storedRegion);
+		const storedName = getStored<string>('name');
+		if (storedName) setSummonerName(storedName);
+	}, []);
 
-				<div className="flex justify-end gap-2">
-					<Button type="submit" aria-label="Search" disabled={isLoading}>
-						{isLoading ? 'Loading...' : 'Search'}
+	return (
+		<motion.div
+			className="flex flex-col gap-1"
+			animate={{
+				y: data ? 0 : '40vh',
+			}}
+			transition={{
+				duration: 0.5,
+				ease: 'easeInOut',
+			}}
+		>
+			<form onSubmit={handleSubmit} className="flex flex-col">
+				<div className="flex flex-col gap-1 sm:flex-row">
+					<div className="flex w-full gap-1">
+						<Select value={selectedRegion} onValueChange={handleRegionChange}>
+							<SelectTrigger
+								aria-label="Region"
+								className="h-14 w-32 border-gold-300/30 border-b-2 bg-blue-600 px-2 font-light text-gold-300 text-xl transition-all hover:border-gold-400/50 hover:text-gold-400 focus:border-gold-400 focus:outline-0 focus:ring-0 focus:ring-offset-0 sm:w-[220px] [&>span]:text-gold-300 hover:[&>span]:text-gold-400 focus:[&>span]:text-gold-400"
+							>
+								<SelectValue placeholder="Region" />
+							</SelectTrigger>
+							<SelectContent className="rounded-sm border-gold-400/30 bg-blue-600 text-gold-300">
+								{SUMMONER_REGIONS.map((region) => (
+									<SelectItem
+										key={region}
+										value={region}
+										className={`mb-1 font-light text-lg tracking-wide last:mb-0 hover:bg-gold-400/10 hover:text-gold-400 focus:bg-gold-400/10 ${
+											selectedRegion === region ? 'bg-gold-400/10' : ''
+										}`}
+									>
+										{region.toUpperCase()}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<div className="relative flex w-full items-center">
+							<Input
+								aria-label="Summoner name"
+								type="text"
+								placeholder=""
+								value={summonerName}
+								autoComplete="off"
+								spellCheck={false}
+								onChange={(e) => setSummonerName(e.target.value)}
+								className="h-14 w-full select-none border-gold-300/30 border-b-2 bg-transparent px-2 font-light text-gold-300 text-xl tracking-wide caret-gold-400 transition-all selection:bg-gold-400/30 hover:border-gold-400/50 focus:border-gold-400 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0 [&::placeholder]:text-transparent"
+								role="search"
+							/>
+							<div className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2 select-none text-xl">
+								{!summonerName && (
+									<span className="text-gold-300 opacity-50">
+										Name
+										<span className="ml-1 rounded bg-gold-300/30 p-1">
+											#TAG
+										</span>
+									</span>
+								)}
+							</div>
+						</div>
+					</div>
+					<Button
+						type="submit"
+						aria-label="Search"
+						disabled={isLoading}
+						className="h-14 border-gold-300/30 border-b-2 bg-transparent px-4 text-gold-300 transition-colors hover:border-gold-400/50 hover:text-gold-400 disabled:opacity-50"
+					>
+						{retryAfter > 0 ? (
+							'Retrying...'
+						) : isLoading ? (
+							'Loading...'
+						) : (
+							<Search className="h-6 w-6" />
+						)}
 					</Button>
 				</div>
 			</form>
-			<SummonerDisplay
-				account={account}
-				summoner={summoner}
-				error={accountError || summonerError}
-			/>
-			<MatchesDisplay
-				matches={matches}
-				error={matchesError}
-				region={selectedRegion}
-			/>
-		</div>
+
+			{data ? (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.3 }}
+				>
+					<SummonerView data={data} region={searchRegion} />
+				</motion.div>
+			) : (
+				<>
+					{(isLoading || retryAfter > 0 || error) && (
+						<LoadingState
+							error={error}
+							retryAfter={retryAfter}
+							isLoading={isLoading}
+						/>
+					)}
+				</>
+			)}
+		</motion.div>
 	);
 }
